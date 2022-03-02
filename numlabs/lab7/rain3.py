@@ -107,13 +107,15 @@ def boundary_conditions(u_array,v_array, h_array, n_grid):
     """Set the boundary condition values.
     """
     u_array[0] = 0
-    v_array[0] = 0
     u_array[1] = 0
     u_array[n_grid - 1] = 0
-    v_array[n_grid - 1] = 0
     u_array[n_grid - 2] = 0
+
+    v_array[0] = 0
     v_array[1] = 0
+    v_array[n_grid - 1] = 0
     v_array[n_grid - 2] = 0
+
     h_array[n_grid - 1] = 0
     h_array[1] = 0
 
@@ -125,15 +127,15 @@ def first_time_step(u, v, h, g, f, H, dt, dx, ho, gu, gh, n_grid):
     """
     u.now[1:n_grid - 1] = 0
     v.now[1:n_grid - 1] = 0
-    factor = gu * ho
+    factor = -gu * ho
     factorv = -factor* dt * f / 2
     midpoint = n_grid // 2
-    if midpoint%2!=0:
-        midpoint-=1
-    v.now[midpoint - 1] = -factorv
-    v.now[midpoint + 1] = factorv
-    u.now[midpoint - 1] = -factor
-    u.now[midpoint + 1] = factor
+    #if midpoint%2!=0:
+    #    midpoint-=1
+    v.now[midpoint - 1] = factorv
+    v.now[midpoint] = -factorv
+    u.now[midpoint - 1] = factor
+    u.now[midpoint] = -factor
     h.now[1:n_grid - 1] = 0
     h.now[midpoint] = ho - g * H * ho * dt ** 2 / ( dx ** 2)
 
@@ -143,9 +145,9 @@ def leap_frog(u, v, h, gu, gh, f, dt, n_grid):
     derived from equations 4.16 and 4.17.
     """
     for pt in np.arange(1, n_grid - 2):
-        u.next[pt] = u.prev[pt] - gu * 2 * (h.now[pt + 1] - h.now[pt - 1]) + 2 * dt * f * v.now[pt]
+        u.next[pt] = u.prev[pt] - gu * 2 * (h.now[pt + 1] - h.now[pt]) + 2 * dt * f * v.now[pt]
         v.next[pt] = v.prev[pt] - f * 2 * dt * u.now[pt]
-        h.next[pt] = h.prev[pt] - gh * 2 * (u.now[pt + 1] - u.now[pt - 1])
+        h.next[pt] = h.prev[pt] - gh * 2 * (u.now[pt] - u.now[pt-1])
 
 #     Alternate vectorized implementation:
 #     u.next[1:n_grid - 1] = (u.prev[1:n_grid - 1]
@@ -165,9 +167,9 @@ def make_graph(u, v, h, dt, n_time, n_grid):
 
     # Create a figure with 2 sub-plots
     fig, (ax_u,ax_v, ax_h) = plt.subplots(3,1, figsize=(15,10))
-    gridh = np.arange(0,n_grid,2)
-    gridv=list(np.arange(1,n_grid,2))
-    gridv=[0]+gridv+[n_grid-1]
+    
+    #gridh=list(np.arange(1,n_grid-1,1))
+    #gridv=[0]+gridv
     # Set the figure title, and the axes labels.
     the_title = fig.text(0.25, 0.95, 'Results from t = %.3fs to %.3fs' % (0, dt*n_time))
     ax_u.set_ylabel('u [cm/s]')
@@ -189,9 +191,9 @@ def make_graph(u, v, h, dt, n_time, n_grid):
     # Do the main plot
     for time in range(0, n_time, interval):
         colorVal = scalarMap.to_rgba(time)
-        ax_u.plot(gridv,u.store[gridv, time], color=colorVal)
-        ax_v.plot(gridv,v.store[gridv, time], color=colorVal)
-        ax_h.plot(gridh,h.store[gridh, time], color=colorVal)
+        ax_u.plot(u.store[:, time], color=colorVal)
+        ax_v.plot(v.store[:, time], color=colorVal)
+        ax_h.plot(h.store[:, time], color=colorVal)
 
     # Add the custom colorbar
     ax2 = fig.add_axes([0.95, 0.05, 0.05, 0.9])
