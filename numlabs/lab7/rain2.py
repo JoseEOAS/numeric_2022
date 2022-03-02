@@ -50,13 +50,13 @@ class Quantity(object):
         """
         self.n_grid = n_grid
         # Storage for values at previous, current, and next time step
-        self.prev = np.empty(n_grid)
-        self.now = np.empty(n_grid)
-        self.next = np.empty(n_grid)
+        self.prev = np.zeros(n_grid)
+        self.now = np.zeros(n_grid)
+        self.next = np.zeros(n_grid)
         # Storage for results at each time step.  In a bigger model
         # the time step results would be written to disk and read back
         # later for post-processing (such as plotting).
-        self.store = np.empty((n_grid, n_time))
+        self.store = np.zeros((n_grid, n_time))
 
 
     def store_timestep(self, time_step, attr='next'):
