@@ -11,13 +11,16 @@ def initialize(timesteps, lab_example=False):
     ''' initialize the physical system, horizontal grid size, etc
     '''
     # below are the parameters that can be varied
-    dx = 1
-    u = 1.
-    dt = 0.45* dx/ u
-    Numpoints = 290
-    shift = Numpoints/5
+    u = 20.
+    domain_length = 86400*20 # so it goes around the domain once in a day
+    effective_points = 500
+    dx = domain_length/effective_points
+
+    dt = 0.4 * dx/ u
+    Numpoints = effective_points + 1
+    shift = Numpoints * dx / 2
     c_0 = 1
-    alpha = 0.01
+    alpha = 1 / (150e3)**2
     epsilon = 0.0001
 
     if lab_example:
@@ -38,10 +41,10 @@ def initialize(timesteps, lab_example=False):
 def boundary_conditions(cmatrix, time, Numpoints):
     '''Set boundary conditions (double thick so it work for Bott Scheme as well as central and upstream
     '''
-    cmatrix[0, 0] = cmatrix[1, Numpoints-1]
-    cmatrix[0, 1] = cmatrix[1, Numpoints]
-    cmatrix[0, Numpoints+2] = cmatrix[1, 3]
-    cmatrix[0, Numpoints+3] = cmatrix[1, 4]
+    cmatrix[time, 0] = cmatrix[time, Numpoints-1]
+    cmatrix[time, 1] = cmatrix[time, Numpoints]
+    cmatrix[time, Numpoints+2] = cmatrix[time, 3]
+    cmatrix[time, Numpoints+3] = cmatrix[time, 4]
 
     return cmatrix
 
@@ -147,12 +150,12 @@ def make_graph(cmatrix, timesteps, Numpoints, dt):
     cNorm_inseconds = colors.Normalize(vmin=0, vmax=1.*timesteps*dt)
     scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cmap)
 
-    # Only try to plot 20 lines, so choose an interval if more than that (i.e. plot
-    # every interval lines
-    interval = np.int(np.ceil(timesteps/20))
+    # Only try to plot 20 lines, so choose an interval if more than that (i.e. plot every interval lines)
+    plotsteps = (np.arange(0, timesteps, timesteps/20) + timesteps/20).astype(int)
 
+    ax.plot(cmatrix[0, :], color='r', linewidth=3)
     # Do the main plot
-    for time in range(0, timesteps, interval):
+    for time in plotsteps:
         colorVal = scalarMap.to_rgba(time)
         ax.plot(cmatrix[time, :], color=colorVal)
 
@@ -181,3 +184,4 @@ def advection3(timesteps, order, lab_example=True):
     ltable = advect3_gettable(order, Numpoints)
     cmatrix = step_advect3(timesteps, ltable, cmatrix, order, Numpoints, u, dt, dx, epsilon)
     make_graph(cmatrix, timesteps, Numpoints, dt)
+    return cmatrix

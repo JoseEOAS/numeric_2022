@@ -12,4 +12,5 @@ Numeric notebooks
      Lab 6 <notebooks/lab6/01-lab6.ipynb>
      Lab 7 <notebooks/lab7/01-lab7.ipynb>
      Lab 8 <notebooks/lab8/01-lab8.ipynb>
+     Lab 9 <notebooks/lab9/01-lab9.ipynb>     
      Lab 10 <notebooks/lab10/01-lab10.ipynb>

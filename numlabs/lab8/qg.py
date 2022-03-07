@@ -245,6 +245,8 @@ def relax(rhs, chi_prev, dx, nx, ny, r_coeff, tol, max_count, loop):
         else:
             rr=r_max / chi_max
         count = count + 1
+    if count >= max_count:
+        print ('Hit maximum interations')
 
     return (chi, count)
 
