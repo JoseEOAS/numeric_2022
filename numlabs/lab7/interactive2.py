@@ -5,12 +5,13 @@ even though the Coriolis force is still included, the scale is so small, its eff
 
 import matplotlib.pyplot as plt
 import numpy as np
+import cmocean
+cmap = cmocean.cm.deep
 
-def interactive1(grid, ngrid, dt, T, small=False):  # return eta
+def interactive2(grid, ngrid, dt, T, fH, small=False):  # return eta
     '''recommended values ngrid=11, dt=150, T=4*3600 (4 hours), small=False OR
-    ngrid=11, dt=4, T=90, small=True
+    ngrid=11, dt=4, T=90, small=True fH= -0.9...0.9. 
     '''
-
     stepper = {1: stepgrid1, 2: stepgrid2, 3: stepgrid3}
     find_depth = {1: find_depth1, 2: find_depth2, 3: find_depth3}
 
@@ -44,7 +45,7 @@ def interactive1(grid, ngrid, dt, T, small=False):  # return eta
     u, v, eta, up, vp, etap = initial(ngrid)
 
 # set-up topography
-    Hu, Hv = find_depth[grid](H0, ngrid)
+    Hu, Hv, Hf = find_depth[grid](H0, ngrid,fH)
 
     # main loop (leap-frog)
     for k in range(ntime):
@@ -61,7 +62,7 @@ def interactive1(grid, ngrid, dt, T, small=False):  # return eta
         u, v, eta, up, vp, etap = exchange(u, v, eta, up, vp, etap)
 
     # plot contours
-    plotit(grid, ngrid, dx, x, y, u, v, eta)
+    plotit(grid, ngrid, dx, x, y, u, v, eta,Hf)
 
     return
 
@@ -78,24 +79,40 @@ def findforcing(L, dx, ngrid):
                                     /(L*L / 48.))
     return x, y, spatial
 
-def find_depth1(H0, ngrid):
+def find_depth1(H0, ngrid,fH):
     print ('Flat Bottom')
     Hu = H0*np.ones((ngrid, ngrid))
     Hv = H0*np.ones_like(Hu)
-    return Hu, Hv
+    Hf=Hu
+    return Hu, Hv,Hf
 
-def find_depth2(H0, ngrid):
+def find_depth2(H0, ngrid,fH):
     print ('Flat Bottom')
     Hu = H0*np.ones((ngrid, ngrid))
     Hv = H0*np.ones_like(Hu)
-    return Hu, Hv
+    Hf=Hu
+    return Hu, Hv,Hf
 
+def find_depth3(H0, ngrid,fH):
+    if fH < 0:
+        fH0 = np.arccos(np.sqrt(1+fH))
+        Hc = np.cos(np.linspace(-fH0,fH0,ngrid*2-1))
+        Hf = H0 *(1+fH)/( np.outer(Hc,Hc))
+        print ('Smooth seamount Bottom')
+    else:
+        fH = np.arccos(np.sqrt(1-fH))
+        Hc = np.cos(np.linspace(-fH,fH,ngrid*2-1))
+        Hf = H0 * np.outer(Hc,Hc)
+        print ('Pool Bottom')
 
-def find_depth3(H0, ngrid):
-    print ('Flat Bottom')
-    Hu = H0*np.ones((ngrid, ngrid))
-    Hv = H0*np.ones_like(Hu)
-    return Hu, Hv
+    iu=np.arange(1,ngrid*2-1,2)
+    ju=np.arange(0,ngrid*2,2)
+
+    Hu=Hf[iu,:]
+    Hu=Hu[:,ju]
+    Hv=Hf[ju,:]
+    Hv=Hv[:,iu]
+    return Hu, Hv, Hf
 
 def initial(ngrid):
     '''initialize a ngrid x ngrid domain, u, v, and eta, all zero'''
@@ -198,7 +215,7 @@ def exchange(u, v, eta, up, vp, etap):
 
     return u, v, eta, up, vp, etap
 
-def plotit(grid, ngrid, dx, x, y, u, v, eta):
+def plotit(grid, ngrid, dx, x, y, u, v, eta,Hf):
     '''Contour plots of u, v, eta'''
 
     shift = {1: (0, 0), 2: (0.5, 0.5), 3: (0.5, 0)}
@@ -223,5 +240,6 @@ def plotit(grid, ngrid, dx, x, y, u, v, eta):
                        0.5 * (v[1:,1:] + v[1:,:-1]).transpose())
     else:
         ax[0,1].quiver(x/1000, y/1000, u.transpose(), v.transpose())
-
-        
+    fig2, ax2 = plt.subplots(figsize=(10,10))
+    Ha=ax2.contourf(Hf,cmap=cmap)
+    plt.colorbar(Ha)
