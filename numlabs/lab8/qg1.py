@@ -14,14 +14,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 
-def param():
+def param(H, b, Av,tau_max, latitude):
     # set the physical parameters of the system
-    Av = 5.e-2           # vertical eddy viscosity (m^2/s)
-    H = 500.               # depth (m)
+    # Av = 5.e-2           # vertical eddy viscosity (m^2/s)
+    # H = 500.               # depth (m)
     rho = 1.0e3            # density of water (kg/m^3)
-    latitude = 45.         # for calculating parameters of the beta-plane (deg)
-    tau_max = 0.2          # wind stress maximum (kg m/s^2)
-    b = 2.0e6              # width of the ocean (m)
+    # latitude = 45.         # for calculating parameters of the beta-plane (deg)
+    # tau_max = 0.2          # wind stress maximum (kg m/s^2)
+    # b = 2.0e6              # width of the ocean (m)
     a = 2.0e6              # N-S extent of the ocean (m)
 
     # necessary constants
@@ -250,11 +250,17 @@ def relax(rhs, chi_prev, dx, nx, ny, r_coeff, tol, max_count, loop):
         pass
 
     return (chi, count)
-
-def qg(totaltime, loop=False):
+# Av = 5.e-2           # vertical eddy viscosity (m^2/s)
+    # H = 500.               # depth (m)
+    rho = 1.0e3            # density of water (kg/m^3)
+    # latitude = 45.         # for calculating parameters of the beta-plane (deg)
+    # tau_max = 0.2          # wind stress maximum (kg m/s^2)
+    # b = 2.0e6              # width of the ocean (m)
+    a = 2.0e6  
+def qg(totaltime,H=500, b=2.06e6, Av=5.e-2,tau_max=0.2, latitude=45., loop=False):
 
     # initialize the physical parameters
-    (pb, pa, pepsilon, pwind, pvis, ptime) = param()
+    (pb, pa, pepsilon, pwind, pvis, ptime) = param(H, b, Av,tau_max, latitude)
     # initialize the numerical parameters
     (nnx, ndx, nny, ndt, ntol, nmax, ncoeff) = numer_init()
 

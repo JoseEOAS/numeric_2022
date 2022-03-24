@@ -56,7 +56,7 @@ def param():
 
 def numer_init():
     # set up domain
-    nx = 30            # number of points in x-direction
+    nx = 60            # number of points in x-direction
     dx = 1./(nx-1)     # size of non-dimensional grid points
     ny = int(1./dx+1)  # number of points in y-direction
 
@@ -64,7 +64,7 @@ def numer_init():
     dt = 43.2e3  # time step
 
     # set up the parameters for the relaxation scheme
-    tol = 0.5e-2   # error tolerance
+    tol = (0.5e-2)/4  # error tolerance
     maxiter = 50     # maximum number of interation
     coeff = 1.  # relaxation coefficient
 
