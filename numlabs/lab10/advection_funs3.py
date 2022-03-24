@@ -137,7 +137,8 @@ def make_graph(ax,cmatrix, timesteps, Numpoints, dt):
     """
 
     # Set the figure title, and the axes labels.
-    the_title = ax.text(0.25, 0.95, 'Concentrations Results from t = %.3fs to %.3fs' % (0, dt*timesteps))
+    the_title = ax.text(0.25, np.max(cmatrix)-0.05, 'Concentrations Results from t = %.3fs to %.3fs' % (0, dt*timesteps))
+
     ax.set_ylabel('Concentration')
     ax.set_xlabel('Grid Point')
 

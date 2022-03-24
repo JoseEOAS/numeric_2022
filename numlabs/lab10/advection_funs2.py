@@ -132,12 +132,12 @@ def step_advect3(timesteps, ltable, cmatrix, order, Numpoints, u, dt, dx, epsilo
 
     return cmatrix
 
-def make_graph(ax,cmatrix, timesteps, Numpoints, dt):
+def make_graph(ax,cmatrix, timesteps, Numpoints, dt,order):
     """Create graphs of the model results using matplotlib.
     """
 
     # Set the figure title, and the axes labels.
-    the_title = ax.text(0.25, 0.95, 'Concentrations Results from t = %.3fs to %.3fs' % (0, dt*timesteps))
+    the_title = ax.text(0.25, np.max(cmatrix)-0.05, 'Concentrations Results from t = %.3fs to %.3fs calculated with order %.1f' % (0, dt*timesteps,order) )
     ax.set_ylabel('Concentration')
     ax.set_xlabel('Grid Point')
 
@@ -180,5 +180,5 @@ def advection3(timesteps, order, axs,lab_example=True):
     dx, u, dt, Numpoints, shift, c_0, alpha, epsilon, cmatrix = initialize(timesteps, lab_example)
     ltable = advect3_gettable(order, Numpoints)
     cmatrix = step_advect3(timesteps, ltable, cmatrix, order, Numpoints, u, dt, dx, epsilon)
-    make_graph(axs,cmatrix, timesteps, Numpoints, dt)
+    make_graph(axs,cmatrix, timesteps, Numpoints, dt,order)
     return cmatrix
