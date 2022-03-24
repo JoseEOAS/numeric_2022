@@ -228,10 +228,10 @@ def plotit(grid, ngrid, dx, x, y, u, v, eta,Hf):
     ax[0,1].set_title('velocity')
     ax[1,0].set_title('u')
     ax[1,1].set_title('v')
-    ax[0,0].contour(x/1000, y/1000, eta.transpose())
-    ax[1,0].contour((x + shift[grid][0] * dx)/1000,
+    ax[0,0].contourf(x/1000, y/1000, eta.transpose())
+    ax[1,0].contourf((x + shift[grid][0] * dx)/1000,
                   (y + shift[grid][1] * dx)/1000, u.transpose())
-    ax[1,1].contour((x + shift[grid][1] * dx)/1000,
+    ax[1,1].contourf((x + shift[grid][1] * dx)/1000,
                   (y + shift[grid][0] * dx)/1000, v.transpose())
 
     if grid == 3:
@@ -243,3 +243,6 @@ def plotit(grid, ngrid, dx, x, y, u, v, eta,Hf):
     fig2, ax2 = plt.subplots(figsize=(10,10))
     Ha=ax2.contourf(Hf,cmap=cmap)
     plt.colorbar(Ha)
+    plt.title('Bathimetry')
+    plt.xlabel('x (km)')
+    plt.ylabel('y (km)')
