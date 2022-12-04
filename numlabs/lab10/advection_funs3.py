@@ -16,7 +16,7 @@ def initialize(timesteps, lab_example=False):
     effective_points = 500
     dx = domain_length/effective_points
 
-    dt = 0.2 * dx/ u
+    dt = 0.4 * dx/ u
     Numpoints = effective_points + 1
     shift = Numpoints * dx / 2
     c_0 = 1
